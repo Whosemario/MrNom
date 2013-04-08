@@ -1,12 +1,25 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html>
 <head>
-  <script src="lib/crafty.js"></script>
-  <script src="src/game.js"></script>
-  <script>
-    window.addEventListener('load', Game.start);
-  </script>
+  <title>Mr.Nom</title> 
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/> 
 </head>
 <body>
+  <div>
+    <canvas id="game">
+      <div id="unsupported">
+        Sorry, this example cannot be run because your browser does not support the &lt;canvas&gt; element
+      </div>
+    </canvas>
+  </div>
+  <script src="lib/FatStoneGame.js" type="text/javascript"></script>
+  <script src="spirit.js" type="text/javascript"></script>
+  <script src="Workspace.js" type="text/javascript"></script>
+  <script>
+    
+  Game.ready(function() {
+    var workspace = Game.start('game', Workspace);
+  });
+  </script>
 </body>
 </html>
