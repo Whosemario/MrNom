@@ -15,6 +15,9 @@ Tail = {
 		//move
 		this.direction = "LEFT";
 
+		//fill mat
+		workspace.mat[this.x/this.w][this.y/this.h] = true;
+
 	},
 
 	update: function(dx){
@@ -44,8 +47,10 @@ Snake = {
 		this.imageInd = 0;
 
 		//properties
-		this.x = workspace.w/2*workspace.unit;
-		this.y = (workspace.h-1)/2*workspace.unit;
+		this.ux = workspace.w/2;
+		this.uy = (workspace.h-1)/2;
+		this.x = this.ux*workspace.unit;
+		this.y = this.uy*workspace.unit;
 		this.w = 32;
 		this.h = 32;
 		this.times = 0;
@@ -64,10 +69,9 @@ Snake = {
 
 		// tails
 		this.tails = new Array();
-		//test tail
-		/*for(var i = 1;i<=4;i++){
-			this.tails.push(Object.construct(Tail,workspace,this.x+30*i,this.y));
-		}*/
+		
+		// fill mat
+		workspace.mat[this.ux][this.uy] = true;
 	},
 
 	draw: function(ctx){
@@ -86,6 +90,14 @@ Snake = {
 			this.x += this.step[this.direction][0];
 			this.y += this.step[this.direction][1];
 			
+			//fill mat
+			if(this.tails.length > 0){
+				this.workspace.mat[this.tails[this.tails.length-1].x/this.w][this.tails[this.tails.length-1].y/this.h] = false;
+			}
+			else{
+				this.workspace.mat[prex/this.w][prey/this.h] = false;
+			}
+
 			//tails
 			for(var i =0;i<this.tails.length;++i){
 				var tmpx = this.tails[i].x;
@@ -105,6 +117,9 @@ Snake = {
 
 			if(this.y<0) this.y = this.bgHeight-this.h;
 			else if(this.y > this.bgHeight) this.y = 0;
+
+			//fill mat
+			this.workspace.mat[this.x/this.w][this.y/this.h] = true;
 		}
 	},
 
@@ -125,25 +140,37 @@ Snake = {
 			prey = this.tails[this.tails.length-1].y;
 		}
 
-		var obj = Object.construct(Tail,this.workspace,prex,prey);
 		if(dirt === "LEFT"){
-			obj.x = prex + this.workspace.unit;
+			prex = prex + this.workspace.unit;
 		}
 		else if(dirt === "RIGHT"){
-			obj.x = prex - this.workspace.unit;
+			prex = prex - this.workspace.unit;
 		}
 		else if(dirt === "UP"){
-			obj.y = prey + this.workspace.unit;
+			prey = prey + this.workspace.unit;
 		}
 		else{
-			obj.y = prey - this.workspace.unit;
+			prey = prey - this.workspace.unit;
 		}
 
-		this.tails.push(obj);
+		this.tails.push(Object.construct(Tail,this.workspace,prex,prey));
 
 	},
 
-	
+	checkCollision: function(){
+		var tmpx = this.x + this.step[this.direction][0];
+		var tmpy = this.y + this.step[this.direction][1];
+
+		if(tmpx<0) tmpx = this.bgWidth-this.w;
+		else if(tmpx > this.bgWidth) tmpx = 0;
+
+		if(tmpy<0) tmpy = this.bgHeight-this.h;
+		else if(tmpy > this.bgHeight) tmpy = 0;
+
+		if(this.workspace.mat[tmpx/this.w][tmpy/this.h]) return true;
+
+		return false;
+	},
 };
 
 //Food
@@ -172,7 +199,8 @@ Food = {
 	},
 
 	update: function(dt){
-
+		if(this.isVisiable === false)
+			this.reset();
 	},
 
 	draw: function(ctx){
@@ -181,8 +209,14 @@ Food = {
 	},
 
 	reset:function(){
+		this.isVisiable = false;
 		this.imageInd = Game.randomInt(0,this.image.length);
-		this.x = Game.randomInt(0,this.workspace.w)*this.workspace.unit;
-		this.y = Game.randomInt(0,this.workspace.h)*this.workspace.unit;
+		var ux = Game.randomInt(0,this.workspace.w);
+		var uy = Game.randomInt(0,this.workspace.h);
+		if(this.workspace.mat[ux][uy] == false){
+			this.x = ux*this.workspace.unit;
+			this.y = uy*this.workspace.unit;
+			this.isVisiable = true;
+		}
 	}
 };

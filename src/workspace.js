@@ -29,7 +29,15 @@ Workspace = {
     this.unit        = 32;
     this.w           = 10;
     this.h           = 15;
+    this.gameover    = false;
 
+    // mat infos
+    this.mat = new Array(this.w);
+    for(var i =0;i<this.w;++i){
+      this.mat[i] = new Array(this.h);
+      for(var j =0;j<this.h;j++)
+        this.mat[i][j] = false;
+    }
 
     //background image infos
     this.bdImageSrc  = "assets/background.png";
@@ -49,13 +57,20 @@ Workspace = {
 
   update: function(dt) {
 
-    this.snake.update(dt);
+    if(this.gameover == false){
+        this.snake.update(dt);
+        this.food.update(dt);
 
-    //Collision Check
-    if(this.food.isVisiable &&
-      Game.Collision.rectOverlap(this.snake,this.food)){
-      this.food.reset();
-      this.snake.addTail();
+        //Collision Check
+
+        if(this.snake.checkCollision())
+          this.gameover = true;
+
+        if(this.food.isVisiable &&
+          Game.Collision.rectOverlap(this.snake,this.food)){
+          this.food.reset();
+          this.snake.addTail();
+        }
     }
   },
 
@@ -63,11 +78,13 @@ Workspace = {
       //background
       ctx.drawImage(this.bdimage,0,0);
 
-      //snake 
-      this.snake.draw(ctx);
+      if(this.gameover === false){
+          //snake 
+          this.snake.draw(ctx);
 
-      //food
-      this.food.draw(ctx);
+          //food
+          this.food.draw(ctx);
+      }
   },
 
   onkeydown : function(keyCode){
