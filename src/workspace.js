@@ -48,7 +48,15 @@ Workspace = {
   },
 
   update: function(dt) {
+
     this.snake.update(dt);
+
+    //Collision Check
+    if(this.food.isVisiable &&
+      Game.Collision.rectOverlap(this.snake,this.food)){
+      this.food.reset();
+      this.snake.addTail();
+    }
   },
 
   draw: function(ctx) {
