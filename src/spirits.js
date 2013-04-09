@@ -14,6 +14,10 @@ Tail = {
 
 	},
 
+	update: function(dx){
+
+	},
+
 	draw: function(ctx){
 		ctx.drawImage(this.image,this.x,this.y);
 	},
@@ -28,16 +32,16 @@ Snake = {
 						 "assets/headdown.png",
 						 "assets/headright.png",
 						 "assets/headup.png"];
-		this.image    = new Array();
+		this.image    = new Array(this.imageSrc.length);
 		for(var i=0;i<this.imageSrc.length;i++)
-			this.image.push(workspace.images[this.imageSrc[i]]);
+			this.image[i] = (workspace.images[this.imageSrc[i]]);
 		this.imageInd = 0;
 
 		//properties
-		this.x = 5;
-		this.y = 5;
-		this.w = 42;
-		this.h = 42;
+		this.x = workspace.w/2*workspace.unit;
+		this.y = (workspace.h-1)/2*workspace.unit;
+		this.w = 32;
+		this.h = 32;
 		this.times = 0;
 
 		//move
@@ -55,8 +59,8 @@ Snake = {
 		// tails
 		this.tails = new Array();
 		//test tail
-		for(var i = 0;i<=3;i++){
-			this.tails.push(Object.construct(Tail,workspace,this.x+42+30*i,this.y));
+		for(var i = 1;i<=4;i++){
+			this.tails.push(Object.construct(Tail,workspace,this.x+30*i,this.y));
 		}
 	},
 
@@ -86,11 +90,11 @@ Snake = {
 			}
 
 			//Fix
-			if(this.x<-this.w) this.x = this.bgWidth;
-			else if(this.x > this.bgWidth) this.x = -this.w;
+			if(this.x<0) this.x = this.bgWidth-this.w;
+			else if(this.x > this.bgWidth) this.x = 0;
 
-			if(this.y<-this.h) this.y = this.bgHeight;
-			else if(this.y > this.bgHeight) this.y = -this.h;
+			if(this.y<0) this.y = this.bgHeight-this.h;
+			else if(this.y > this.bgHeight) this.y = 0;
 		}
 	},
 
@@ -99,5 +103,37 @@ Snake = {
 			this.direction = dirt;
 			this.imageInd  = this.step[dirt][2];
 		}
+	},
+};
+
+//Food
+Food = {
+	initialize: function(workspace){
+		// image infos
+		this.imageSrc =["assets/stain1.png",
+             			"assets/stain2.png",
+             			"assets/stain3.png"];
+        this.image    = new Array(this.imageSrc.length);
+		for(var i=0;i<this.imageSrc.length;i++)
+			this.image[i] = (workspace.images[this.imageSrc[i]]);
+		this.imageInd = Game.randomInt(0,this.image.length);
+
+		//properties
+		this.x = 0;
+		this.y = 0;
+		this.w = 32;
+		this.h = 32;
+
+		//status
+		this.isVisiable = true;
+	},
+
+	update: function(dt){
+
+	},
+
+	draw: function(ctx){
+		if(this.isVisiable)
+			ctx.drawImage(this.image[this.imageInd],this.x,this.y);
 	},
 };

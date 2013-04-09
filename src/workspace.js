@@ -3,7 +3,7 @@ Workspace = {
   Defaults: {
     width:  320,   // logical canvas width (browser will scale to physical canvas size - which is controlled by @media css queries)
     height: 480,   // logical canvas height (ditto)
-    stats: true,   // tell Game.Runner to show stats
+    stats: false,   // tell Game.Runner to show stats
   },
 
   Images : ["assets/background.png",
@@ -11,7 +11,10 @@ Workspace = {
              "assets/headdown.png",
              "assets/headright.png",
              "assets/headup.png",
-             "assets/tail.png"],
+             "assets/tail.png",
+             "assets/stain1.png",
+             "assets/stain2.png",
+             "assets/stain3.png"],
 
   //-----------------------------------------------------------------------------
 
@@ -23,6 +26,10 @@ Workspace = {
     this.width       = runner.width;
     this.height      = runner.height;
     this.images      = images;
+    this.unit        = 32;
+    this.w           = 10;
+    this.h           = 15;
+
 
     //background image infos
     this.bdImageSrc  = "assets/background.png";
@@ -30,6 +37,9 @@ Workspace = {
 
     // snake
     this.snake = Object.construct(Snake,this);
+
+    // food
+    this.food = Object.construct(Food,this);
 
     // game start
     this.runner.start();
@@ -47,6 +57,9 @@ Workspace = {
 
       //snake 
       this.snake.draw(ctx);
+
+      //food
+      this.food.draw(ctx);
   },
 
   onkeydown : function(keyCode){
