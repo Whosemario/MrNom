@@ -16,7 +16,7 @@ Tail = {
 		this.direction = "LEFT";
 
 		//fill mat
-		workspace.mat[this.x/this.w][this.y/this.h] = true;
+		workspace.mat[this.x/this.w][this.y/this.h] |= 4;
 
 	},
 
@@ -91,11 +91,10 @@ Snake = {
 			this.y += this.step[this.direction][1];
 			
 			//fill mat
+			this.workspace.mat[prex/this.w][prey/this.h] &= ~(2);
 			if(this.tails.length > 0){
-				this.workspace.mat[this.tails[this.tails.length-1].x/this.w][this.tails[this.tails.length-1].y/this.h] = false;
-			}
-			else{
-				this.workspace.mat[prex/this.w][prey/this.h] = false;
+				this.workspace.mat[prex/this.w][prey/this.h] |= 4;
+				this.workspace.mat[this.tails[this.tails.length-1].x/this.w][this.tails[this.tails.length-1].y/this.h] &= ~(4);
 			}
 
 			//tails
@@ -119,7 +118,7 @@ Snake = {
 			else if(this.y > this.bgHeight) this.y = 0;
 
 			//fill mat
-			this.workspace.mat[this.x/this.w][this.y/this.h] = true;
+			this.workspace.mat[this.x/this.w][this.y/this.h] |= 2;
 		}
 	},
 
@@ -158,16 +157,16 @@ Snake = {
 	},
 
 	checkCollision: function(){
-		var tmpx = this.x + this.step[this.direction][0];
+/*		var tmpx = this.x + this.step[this.direction][0];
 		var tmpy = this.y + this.step[this.direction][1];
 
 		if(tmpx<0) tmpx = this.bgWidth-this.w;
 		else if(tmpx > this.bgWidth) tmpx = 0;
 
 		if(tmpy<0) tmpy = this.bgHeight-this.h;
-		else if(tmpy > this.bgHeight) tmpy = 0;
+		else if(tmpy > this.bgHeight) tmpy = 0;*/
 
-		if(this.workspace.mat[tmpx/this.w][tmpy/this.h]) return true;
+		if((this.workspace.mat[this.x/this.w][this.y/this.h]&4)) return true;
 
 		return false;
 	},
@@ -213,10 +212,47 @@ Food = {
 		this.imageInd = Game.randomInt(0,this.image.length);
 		var ux = Game.randomInt(0,this.workspace.w);
 		var uy = Game.randomInt(0,this.workspace.h);
-		if(this.workspace.mat[ux][uy] == false){
+		if(this.workspace.mat[ux][uy] == 0){
 			this.x = ux*this.workspace.unit;
 			this.y = uy*this.workspace.unit;
 			this.isVisiable = true;
 		}
 	}
 };
+
+// StartPage
+StartPage = {
+	initialize: function(workspace){
+		this.imageSrc = "assets/logo.png";
+		this.image    = workspace.images[this.imageSrc];
+
+		//properties
+		this.w = 256;
+		this.h = 160;
+		this.x = workspace.width/2-this.w/2;
+		this.y = workspace.height/2-this.h/2;
+	},
+
+	draw:function(ctx){
+		ctx.drawImage(this.image,this.x,this.y);
+	},
+};
+
+// Game Over
+Gameover = {
+	initialize: function(workspace){
+		this.imageSrc = "assets/gameover.png";
+		this.image    = workspace.images[this.imageSrc];
+
+		//properties
+		this.w = 196;
+		this.h = 50;
+		this.x = workspace.width/2-this.w/2;
+		this.y = workspace.height/2-this.h/2;
+	},
+
+	draw:function(ctx){
+		ctx.drawImage(this.image,this.x,this.y);
+	},
+};
+

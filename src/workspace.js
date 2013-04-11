@@ -14,7 +14,9 @@ Workspace = {
              "assets/tail.png",
              "assets/stain1.png",
              "assets/stain2.png",
-             "assets/stain3.png"],
+             "assets/stain3.png",
+             "assets/logo.png",
+             "assets/gameover.png"],
 
   //-----------------------------------------------------------------------------
 
@@ -29,14 +31,14 @@ Workspace = {
     this.unit        = 32;
     this.w           = 10;
     this.h           = 15;
-    this.gameover    = false;
+    this.scene       = 1;  // 1: start page , 2: play , 3, gameover
 
     // mat infos
     this.mat = new Array(this.w);
     for(var i =0;i<this.w;++i){
       this.mat[i] = new Array(this.h);
       for(var j =0;j<this.h;j++)
-        this.mat[i][j] = false;
+        this.mat[i][j] = 0;
     }
 
     //background image infos
@@ -49,6 +51,12 @@ Workspace = {
     // food
     this.food = Object.construct(Food,this);
 
+    // start page
+    this.startPage = Object.construct(StartPage,this);
+
+    // game over
+    this.gameover = Object.construct(Gameover,this);
+
     // game start
     this.runner.start();
 
@@ -57,33 +65,52 @@ Workspace = {
 
   update: function(dt) {
 
-    if(this.gameover == false){
-        this.snake.update(dt);
-        this.food.update(dt);
+    switch(this.scene){
+        case 1 :
+          break;
+        case 2 :
+          this.snake.update(dt);
+          this.food.update(dt);
 
-        //Collision Check
+          //Collision Check
 
-        if(this.snake.checkCollision())
-          this.gameover = true;
+          if(this.snake.checkCollision())
+            this.scene = 3;
 
-        if(this.food.isVisiable &&
-          Game.Collision.rectOverlap(this.snake,this.food)){
-          this.food.reset();
-          this.snake.addTail();
-        }
-    }
+          if(this.food.isVisiable &&
+            Game.Collision.rectOverlap(this.snake,this.food)){
+            this.food.reset();
+            this.snake.addTail();
+          }
+          break;
+        case 3:
+          break;
+      }
   },
 
   draw: function(ctx) {
       //background
       ctx.drawImage(this.bdimage,0,0);
 
-      if(this.gameover === false){
+      switch(this.scene){
+        case 1 :
+          // start page
+          this.startPage.draw(ctx);
+          break;
+        case 2 :
           //snake 
           this.snake.draw(ctx);
 
           //food
           this.food.draw(ctx);
+
+          break;
+        case 3:
+          //snake 
+          this.snake.draw(ctx);
+          //game over
+          this.gameover.draw(ctx);
+          break;
       }
   },
 
@@ -93,6 +120,7 @@ Workspace = {
         case Game.KEY.RIGHT : this.snake.changeDirection("RIGHT");break;
         case Game.KEY.UP    : this.snake.changeDirection("UP");break;
         case Game.KEY.DOWN  : this.snake.changeDirection("DOWN");break;
+        case Game.KEY.SPACE : this.scene = 2;break;
       }
   },
 
